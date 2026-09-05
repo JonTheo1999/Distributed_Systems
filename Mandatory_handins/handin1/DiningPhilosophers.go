@@ -16,6 +16,13 @@ func main() {
 	chF3 := make(chan bool)
 	chF4 := make(chan bool)
 	chF5 := make(chan bool)
+
+	chF1_P1 := make(chan bool)
+	chF1_P5 := make(chan bool)
+
+	chF5_P4 := make(chan bool)
+	chF5_P5 := make(chan bool)
+
 	chF1 <- true
 	chF2 <- true
 	chF3 <- true
@@ -36,8 +43,19 @@ func main() {
 
 }
 
-func fork1(chP1, chP5 chan string, chF1 chan bool) {
-	//chF1 <- true
+func fork1(chF1_P5, chF1_P1 chan string) {
+	available := true
+
+	for {
+		select {}
+	}
+	request1 := <-chF1_P1
+	request5 := <-chF1_P5
+
+	if request1 == "I want to eat!" && request5 == "I want to eat!" {
+
+		chF1_P5 <- "Of course!"
+	}
 }
 func fork2(chP1, chP2 chan string, chF2 chan bool) {
 	//chF2 <- true
@@ -76,34 +94,36 @@ func philosopher4(chF4, chF5 chan bool, chP4 chan string) {
 	fmt.Println("philosopher4: I am thinking")
 }
 
-func philosopher5(chF5, chF1 chan bool, chP5 chan string, timesEaten int) {
+func philosopher5(chF5_P5, chF1_P5 chan string, timesEaten int) {
 	fmt.Println("philosopher5: I am thinking")
+
 	if timesEaten >= 3 {
 		return
 	}
 
-	a := <-chF1
-	b := <-chF5
+	chF1_P5 <- "I want to eat!"
+	answerF1 := <-chF1_P5
 
-	if a && b {
-		chF5 <- false
-		chF1 <- false
+	chF5_P5 <- "I want to eat!"
+	answerF5 := <-chF5_P5
+
+	if answerF1 == "Of course!" && answerF5 == "Of course!" {
 		fmt.Println("philosopher5: *eating*")
 		timesEaten++
 		time.Sleep(3 * time.Second)
-		chF5 <- true
-		chF1 <- true
-		philosopher5(chF5, chF1, chP5, timesEaten)
-	} else if (!a && b) || (a && !b) {
-		if !a && b {
-			chF5 <- true
-		} else if a && !b {
-			chF1 <- true
+		chF5_P5 <- "Thanks for the meal!"
+		chF1_P5 <- "Thanks for the meal!"
+		philosopher5(chF5_P5, chF1_P5, timesEaten)
+	} else if (answerF1 == "Sorry, I am taken..." && answerF5 == "Of course!") || (answerF5 == "Sorry, I am taken..." && answerF1 == "Of course!") {
+		if answerF1 == "Sorry, I am taken..." && answerF5 == "Of course!" {
+			chF5_P5 <- "Never mind then"
+		} else if answerF5 == "Sorry, I am taken..." && answerF1 == "Of course!" {
+			chF1_P5 <- "Never mind then"
 		}
 		time.Sleep(2 * time.Second)
-		philosopher5(chF5, chF1, chP5, timesEaten)
+		philosopher5(chF5_P5, chF1_P5, timesEaten)
 	} else {
 		time.Sleep(2 * time.Second)
-		philosopher5(chF5, chF1, chP5, timesEaten)
+		philosopher5(chF5_P5, chF1_P5, timesEaten)
 	}
 }
