@@ -3,82 +3,104 @@ package main
 import (
 	"fmt"
 	"time"
+	"sync"
 )
 
+
+type Fork struct {
+	aquire chan chan bool
+	release chan struct{}
+}
+
+func fork(aquire <-chan chan bool, release <-chan struct{}) {
+	available := true
+	for {
+		select {
+		case reply := <-aquire:
+			if available {
+				available = false
+				reply <- true
+			} else {
+				reply <- false
+			}
+		case <-release:
+			available = true
+		}
+	}
+}
+
+func tryAquire(fork Fork) bool {
+	reply := make(chan bool)
+	fork.aquire <- reply
+	return <-reply
+}
+func releaseFork(fork Fork) {
+	fork.release <- struct{}{}
+}
+
+func philosopher(name string,
+	left Fork,
+	right Fork,
+	wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	eaten := 0
+	for eaten < 3 {
+		fmt.Println(name, "is thinking")
+		time.Sleep(100 * time.Millisecond)
+
+		first := left
+		second := right
+
+		if name == "Philosopher 5" {
+			first = right
+			second = left
+		}
+
+		if !tryAquire(first) {
+			continue
+		}
+
+		if !tryAquire(second) {
+			releaseFork(first)
+			time.Sleep(50 * time.Millisecond)
+			continue
+		}
+
+		fmt.Println(name, "is eating")
+		time.Sleep(150 * time.Millisecond)
+
+		releaseFork(second)
+		releaseFork(first)
+
+		eaten++
+		fmt.Println(name, "has finished eating", eaten, "times")
+	}
+
+	fmt.Println(name, "is done eating")
+
+}
+
 func main() {
-	chP1 := make(chan string)
-	chP2 := make(chan string)
-	chP3 := make(chan string)
-	chP4 := make(chan string)
-	chP5 := make(chan string)
-	chF1 := make(chan bool)
-	chF2 := make(chan bool)
-	chF3 := make(chan bool)
-	chF4 := make(chan bool)
-	chF5 := make(chan bool)
+	forks := make([]Fork, 5)
 
-}
-
-func fork1(chP1, chP5 chan string, chF1 chan bool) {
-	chF1 <- true
-}
-
-func fork2(chP1, chP2 chan string, chF2 chan bool) {
-	chF2 <- true
-}
-
-func fork3(chP3, chP2 chan string, chF3 chan bool) {
-	chF3 <- true
-}
-
-func fork4(chP4, chP3 chan string, chF4 chan bool) {
-	chF4 <- true
-}
-
-func fork5(chP4, chP5 chan string, chF5 chan bool) {
-	chF5 <- true
-}
-
-func philosopher1(chF1, chF2 chan bool, chP1 chan string) {
-	chP1 <- "I am thinking!"
-	fmt.Println("philosopher1: " + chP1)
-	
-	chP1 <- "I am eating"
-
-}
-
-func philosopher2(chF3, chF2 chan bool, chP2 chan string) {
-	chP2 <- "I am thinking!"
-	fmt.Println("philosopher2: " + chP2)
-
-}
-
-func philosopher3(chF3, chF4 chan bool, chP3 chan string) {
-	chP3 <- "I am thinking!"
-	fmt.Println("philosopher3: " + chP3)
-}
-
-func philosopher4(chF5, chF4 chan bool, chP4 chan string) {
-	chP4 <- "I am thinking!"
-	fmt.Println("philosopher4: " + chP4)
-}
-
-func philosopher5(chF5, chF1 chan bool, chP5 chan string, timesEaten int) {
-	chP5 <- "I am thinking!"
-	fmt.println("philosopher5: " + chP5)
-	if timesEaten >= 3 {
-		return
+	for i := range forks {
+		forks[i] = Fork{
+			aquire: make(chan chan bool),
+			release: make(chan struct{}),
+		}
+		go fork(forks[i].aquire, forks[i].release)
 	}
-	if chF5 == true && chF1 == true {
-		chF5 <- false
-		chF1 <- false
-		chP5 <- "I am eating!"
-		fmt.Println("philosopher5: " + chP5)
-		fmt.Println("philosopher5: *eating*")
-		timesEaten++
-		time.sleep(3 * time.Second)
-		chF5 <- true
-		chF1 <- true
-		philosopher5(chF5, chF1 chan bool, chP5 chan string, timesEaten int)
-	}
+
+	var wg sync.WaitGroup
+	wg.Add(5)
+
+	go philosopher("Philosopher 1", forks[0], forks[1], &wg)
+	go philosopher("Philosopher 2", forks[1], forks[2], &wg)
+	go philosopher("Philosopher 3", forks[2], forks[3], &wg)
+	go philosopher("Philosopher 4", forks[3], forks[4], &wg)
+	go philosopher("Philosopher 5", forks[4], forks[0], &wg)
+
+	wg.Wait()
+	fmt.Println("All philosophers are done eating")
 }
