@@ -30,15 +30,11 @@ func main() {
 	go fork4(chF4_P3, chF4_P4)
 	go fork5(chF5_P4, chF5_P5)
 
-	wg.Add(1)
+	wg.Add(5)
 	go philosopher1(chF1_P1, chF2_P1, 0, &wg)
-	wg.Add(1)
 	go philosopher2(chF2_P2, chF3_P2, 0, &wg)
-	wg.Add(1)
 	go philosopher3(chF3_P3, chF4_P3, 0, &wg)
-	wg.Add(1)
 	go philosopher4(chF4_P4, chF5_P4, 0, &wg)
-	wg.Add(1)
 	go philosopher5(chF1_P5, chF5_P5, 0, &wg)
 
 	wg.Wait()
@@ -50,7 +46,9 @@ func fork1(chF1_P1, chF1_P5 chan string) {
 	available := true
 	// Each fork goroutine only ever receives a request and immediately replies
 	// (granted or denied) based on its own local "available" state — it never waits
-	// on a response from a philosopher or another fork before continuing its loop. PREVENTS DEADLOCK
+	// on a response from a philosopher or another fork before continuing its loop.
+	// This is implemented for ALL forks.
+	// PREVENTS DEADLOCK
 
 	for {
 		select {
@@ -245,9 +243,10 @@ func philosopher1Loop(chF1_P1, chF2_P1 chan string, timesEaten int) {
 	answer2 := <-chF2_P1
 
 	// A philosopher only proceeds to eat if BOTH neighboring forks respond "Of course!".
-	// If only one fork is available, that fork is immediately released ("Never mind then") 
-	// instead of being held while waiting for the second one. This is implemented for ALL philosophers.
-	//  PREVENTS DEADLOCK
+	// If only one fork is available, that fork is immediately released ("Never mind then")
+	// instead of being held while waiting for the second one. NO "Hold and wait".
+	// This is implemented for ALL philosophers.
+	// PREVENTS DEADLOCK
 	if answer1 == "Of course!" && answer2 == "Of course!" {
 		fmt.Println("philosopher1: *eating*")
 		timesEaten++
