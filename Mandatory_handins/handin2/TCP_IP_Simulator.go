@@ -1,8 +1,8 @@
 package main
 
 import (
-	"sync"
 	"fmt"
+	"sync"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	go server(ch, &wg)
 
 	wg.Wait()
-	fmt.Println("Connection Established: Sending Data...")
+	fmt.Println("Data sent!")
 }
 
 func client(ch chan Message, wg *sync.WaitGroup) {
@@ -25,7 +25,11 @@ func client(ch chan Message, wg *sync.WaitGroup) {
 	if answerFromServer.From == "server" {
 		connect := Message{From: "client", Type: ACK, Seq: msg.Seq + 1, Ack: answerFromServer.Seq + 1}
 		ch <- connect
+		data := Message{From: "client", Type: DATA, Seq: msg.Seq + 1, Ack: answerFromServer.Seq + 1}
+		ch <- data
 	}
+
+	
 
 	wg.Done()
 }
@@ -36,7 +40,10 @@ func server(ch chan Message, wg *sync.WaitGroup) {
 	if call.From == "client" {
 		msg := Message{From: "server", Type: SYNACK, Seq: 300, Ack: call.Seq + 1}
 		ch <- msg
-		_ = <- ch // connection established
+		connect := <-ch // connection established
+		fmt.Println("Connection Established: Sending Data:", connect)
+		receivedData := <-ch
+		fmt.Println("Server received data:", receivedData)
 	}
 
 	wg.Done()
