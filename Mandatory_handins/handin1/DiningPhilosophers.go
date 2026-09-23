@@ -42,13 +42,29 @@ func main() {
 
 }
 
+// FORK DESIGN (identical for fork1–fork5):
+// Each fork tracks whether it is currently free with the "available" variable and whether it´s
+// neighbors are waiting with the "pendingP_" variable. When a
+// fork is busy, it does NOT reject the requesting philosopher. Instead it records the
+// request as pending and sends no reply. The philosopher's receive (<-chX_PY)
+// therefore blocks until the fork later becomes free and actively sends
+// "Of course!" to the waiting neighbor (see the "Thanks for the meal!" case).
+// This implements philosophers HOLDING a fork while WAITING for the other.
+// Coffman's "hold and wait" condition IS present in this design.
+// Deadlock is instead prevented by breaking the "circular wait" condition.
+// see the comment in philosopher5Loop.
+
+// philosopher1–philosopher4 all request their forks in the same fixed order
+// (their lower-numbered neighbor fork first, then the higher-numbered one).
+// Because forks now implement hold-and-wait, a fully symmetric ring where 
+// everyone requests forks in the same rotational order risks circular wait. 
+// philosopher5 breaks this symmetry by requesting in the opposite order.
+// See philosopher5Loop for why that prevents deadlock.
+
 func fork1(chF1_P1, chF1_P5 chan string) {
 	available := true
-	// Each fork goroutine only ever receives a request and immediately replies
-	// (granted or denied) based on its own local "available" state — it never waits
-	// on a response from a philosopher or another fork before continuing its loop.
-	// This is implemented for ALL forks.
-	// PREVENTS DEADLOCK
+	pendingP1 := false 
+	pendingP5 := false
 
 	for {
 		select {
@@ -58,14 +74,19 @@ func fork1(chF1_P1, chF1_P5 chan string) {
 					available = false
 					chF1_P1 <- "Of course!"
 				} else {
-					chF1_P1 <- "Sorry, I am taken..."
+					//chF1_P1 <- "Sorry, I am taken..."
+					pendingP1 = true
 				}
-			} else if msg1 == "Never mind then" {
-				available = true
-
 			} else if msg1 == "Thanks for the meal!" {
-				available = true
-
+				if pendingP1 {
+					pendingP1 = false
+					chF1_P1 <- "Of course!"
+				} else if pendingP5 {
+					pendingP5 = false
+					chF1_P5 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 
 		case msg5 := <-chF1_P5:
@@ -74,19 +95,28 @@ func fork1(chF1_P1, chF1_P5 chan string) {
 					available = false
 					chF1_P5 <- "Of course!"
 				} else {
-					chF1_P5 <- "Sorry, I am taken..."
+					//chF1_P5 <- "Sorry, I am taken..."
+					pendingP5 = true
 				}
-			} else if msg5 == "Never mind then" {
-				available = true
 			} else if msg5 == "Thanks for the meal!" {
-				available = true
+				if pendingP5 {
+					pendingP5 = false
+					chF1_P5 <- "Of course!"
+				} else if pendingP1 {
+					pendingP1 = false
+					chF1_P1 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 		}
 	}
 }
 
-func fork2(chF2_P1, chF1_P2 chan string) {
+func fork2(chF2_P1, chF2_P2 chan string) {
 	available := true
+	pendingP1 := false 
+	pendingP2 := false
 
 	for {
 		select {
@@ -96,32 +126,46 @@ func fork2(chF2_P1, chF1_P2 chan string) {
 					available = false
 					chF2_P1 <- "Of course!"
 				} else {
-					chF2_P1 <- "Sorry, I am taken..."
+					pendingP1 = true
 				}
-			} else if msg1 == "Never mind then" {
-				available = true
 			} else if msg1 == "Thanks for the meal!" {
-				available = true
+				if pendingP1 {
+					pendingP1 = false
+					chF2_P1 <- "Of course!"
+				} else if pendingP2 {
+					pendingP2 = false
+					chF2_P2 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 
-		case msg2 := <-chF1_P2:
+		case msg2 := <-chF2_P2:
 			if msg2 == "I want to eat!" {
 				if available {
 					available = false
-					chF1_P2 <- "Of course!"
+					chF2_P2 <- "Of course!"
 				} else {
-					chF1_P2 <- "Sorry, I am taken..."
+					pendingP2 = true
 				}
-			} else if msg2 == "Never mind then" {
-				available = true
 			} else if msg2 == "Thanks for the meal!" {
-				available = true
+				if pendingP2 {
+					pendingP2 = false
+					chF2_P2 <- "Of course!"
+				} else if pendingP1 {
+					pendingP1 = false
+					chF2_P1 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 		}
 	}
 }
 func fork3(chF3_P2, chF3_P3 chan string) {
 	available := true
+	pendingP2 := false
+	pendingP3 := false
 
 	for {
 		select {
@@ -131,12 +175,18 @@ func fork3(chF3_P2, chF3_P3 chan string) {
 					available = false
 					chF3_P2 <- "Of course!"
 				} else {
-					chF3_P2 <- "Sorry, I am taken..."
+					pendingP2 = true
 				}
-			} else if msg2 == "Never mind then" {
-				available = true
 			} else if msg2 == "Thanks for the meal!" {
-				available = true
+				if pendingP2 {
+					pendingP2 = false
+					chF3_P2 <- "Of course!"
+				} else if pendingP3 {
+					pendingP3 = false
+					chF3_P3 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 
 		case msg3 := <-chF3_P3:
@@ -145,68 +195,98 @@ func fork3(chF3_P2, chF3_P3 chan string) {
 					available = false
 					chF3_P3 <- "Of course!"
 				} else {
-					chF3_P3 <- "Sorry, I am taken..."
+					pendingP3 = true
 				}
-			} else if msg3 == "Never mind then" {
-				available = true
 			} else if msg3 == "Thanks for the meal!" {
-				available = true
+				if pendingP3 {
+					pendingP3 = false
+					chF3_P3 <- "Of course!"
+				} else if pendingP2 {
+					pendingP2 = false
+					chF3_P2 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 		}
 	}
 }
-func fork4(chF3_P3, chF3_P4 chan string) {
+
+func fork4(chF4_P3, chF4_P4 chan string) {
 	available := true
+	pendingP3 := false
+	pendingP4 := false
 
 	for {
 		select {
-		case msg3 := <-chF3_P3:
+		case msg3 := <-chF4_P3:
 			if msg3 == "I want to eat!" {
 				if available {
 					available = false
-					chF3_P3 <- "Of course!"
+					chF4_P3 <- "Of course!"
 				} else {
-					chF3_P3 <- "Sorry, I am taken..."
+					pendingP3 = true
 				}
-			} else if msg3 == "Never mind then" {
-				available = true
 			} else if msg3 == "Thanks for the meal!" {
-				available = true
+				if pendingP3 {
+					pendingP3 = false
+					chF4_P3 <- "Of course!"
+				} else if pendingP4 {
+					pendingP4 = false
+					chF4_P4 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 
-		case msg4 := <-chF3_P4:
+		case msg4 := <-chF4_P4:
 			if msg4 == "I want to eat!" {
 				if available {
 					available = false
-					chF3_P4 <- "Of course!"
+					chF4_P4 <- "Of course!"
 				} else {
-					chF3_P4 <- "Sorry, I am taken..."
+					pendingP4 = true
 				}
-			} else if msg4 == "Never mind then" {
-				available = true
 			} else if msg4 == "Thanks for the meal!" {
-				available = true
+				if pendingP4 {
+					pendingP4 = false
+					chF4_P4 <- "Of course!"
+				} else if pendingP3 {
+					pendingP3 = false
+					chF4_P3 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 		}
 	}
 }
+
 func fork5(chF5_P4, chF5_P5 chan string) {
 	available := true
+	pendingP4 := false
+	pendingP5 := false
 
 	for {
 		select {
-		case msg1 := <-chF5_P4:
-			if msg1 == "I want to eat!" {
+		case msg4 := <-chF5_P4:
+			if msg4 == "I want to eat!" {
 				if available {
 					available = false
 					chF5_P4 <- "Of course!"
 				} else {
-					chF5_P4 <- "Sorry, I am taken..."
+					pendingP4 = true
 				}
-			} else if msg1 == "Never mind then" {
-				available = true
-			} else if msg1 == "Thanks for the meal!" {
-				available = true
+			} else if msg4 == "Thanks for the meal!" {
+				if pendingP4 {
+					pendingP4 = false
+					chF5_P4 <- "Of course!"
+				} else if pendingP5 {
+					pendingP5 = false
+					chF5_P5 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 
 		case msg5 := <-chF5_P5:
@@ -215,12 +295,18 @@ func fork5(chF5_P4, chF5_P5 chan string) {
 					available = false
 					chF5_P5 <- "Of course!"
 				} else {
-					chF5_P5 <- "Sorry, I am taken..."
+					pendingP5 = true
 				}
-			} else if msg5 == "Never mind then" {
-				available = true
 			} else if msg5 == "Thanks for the meal!" {
-				available = true
+				if pendingP5 {
+					pendingP5 = false
+					chF5_P5 <- "Of course!"
+				} else if pendingP4 {
+					pendingP4 = false
+					chF5_P4 <- "Of course!"
+				} else {
+					available = true
+				}
 			}
 		}
 	}
@@ -239,154 +325,99 @@ func philosopher1Loop(chF1_P1, chF2_P1 chan string, timesEaten int) {
 	}
 
 	chF1_P1 <- "I want to eat!"
-	answer1 := <-chF1_P1
+	<-chF1_P1        
 
 	chF2_P1 <- "I want to eat!"
-	answer2 := <-chF2_P1
+	<-chF2_P1
 
-	// A philosopher only proceeds to eat if BOTH neighboring forks respond "Of course!".
-	// If only one fork is available, that fork is immediately released ("Never mind then")
-	// instead of being held while waiting for the second one. NO "Hold and wait".
-	// This is implemented for ALL philosophers.
-	// PREVENTS DEADLOCK
-	if answer1 == "Of course!" && answer2 == "Of course!" {
-		fmt.Println("philosopher1: *eating*")
-		timesEaten++
-		time.Sleep(3 * time.Second)
-		chF1_P1 <- "Thanks for the meal!"
-		chF2_P1 <- "Thanks for the meal!"
-		philosopher1Loop(chF1_P1, chF2_P1, timesEaten)
-	} else if (answer1 == "Sorry, I am taken..." && answer2 == "Of course!") || (answer2 == "Sorry, I am taken..." && answer1 == "Of course!") {
-		if answer1 == "Sorry, I am taken..." && answer2 == "Of course!" {
-			chF2_P1 <- "Never mind then"
-		} else if answer2 == "Sorry, I am taken..." && answer1 == "Of course!" {
-			chF1_P1 <- "Never mind then"
-		}
-		time.Sleep(2 * time.Second)
-		philosopher1Loop(chF1_P1, chF2_P1, timesEaten)
-	} else {
-		time.Sleep(2 * time.Second)
-		philosopher1Loop(chF1_P1, chF2_P1, timesEaten)
-	}
+	fmt.Println("philosopher1: *eating*")
+	timesEaten++
+	time.Sleep(3 * time.Second)
+	chF1_P1 <- "Thanks for the meal!"
+	chF2_P1 <- "Thanks for the meal!"
+
+	philosopher1Loop(chF1_P1, chF2_P1, timesEaten)
 }
 
-func philosopher2(chF1_P2, chF2_P2 chan string, timesEaten int, wg *sync.WaitGroup) {
+func philosopher2(chF2_P2, chF3_P2 chan string, timesEaten int, wg *sync.WaitGroup) {
 	defer wg.Done()
-	philosopher2Loop(chF1_P2, chF2_P2, timesEaten)
-
+	philosopher2Loop(chF2_P2, chF3_P2, timesEaten)
 }
 
-func philosopher2Loop(chF1_P2, chF2_P2 chan string, timesEaten int) {
+func philosopher2Loop(chF2_P2, chF3_P2 chan string, timesEaten int) {
 	fmt.Println("philosopher2: I am thinking")
 
 	if timesEaten >= 3 {
 		return
 	}
 
-	chF1_P2 <- "I want to eat!"
-	answer1 := <-chF1_P2
-
 	chF2_P2 <- "I want to eat!"
-	answer2 := <-chF2_P2
+	<-chF2_P2
 
-	if answer1 == "Of course!" && answer2 == "Of course!" {
-		fmt.Println("philosopher2: *eating*")
-		timesEaten++
-		time.Sleep(3 * time.Second)
-		chF1_P2 <- "Thanks for the meal!"
-		chF2_P2 <- "Thanks for the meal!"
-		philosopher2Loop(chF1_P2, chF2_P2, timesEaten)
-	} else if (answer1 == "Sorry, I am taken..." && answer2 == "Of course!") || (answer2 == "Sorry, I am taken..." && answer1 == "Of course!") {
-		if answer1 == "Sorry, I am taken..." && answer2 == "Of course!" {
-			chF2_P2 <- "Never mind then"
-		} else if answer2 == "Sorry, I am taken..." && answer1 == "Of course!" {
-			chF1_P2 <- "Never mind then"
-		}
-		time.Sleep(2 * time.Second)
-		philosopher2Loop(chF1_P2, chF2_P2, timesEaten)
-	} else {
-		time.Sleep(2 * time.Second)
-		philosopher2Loop(chF1_P2, chF2_P2, timesEaten)
-	}
+	chF3_P2 <- "I want to eat!"
+	<-chF3_P2
 
+	fmt.Println("philosopher2: *eating*")
+	timesEaten++
+	time.Sleep(3 * time.Second)
+	chF2_P2 <- "Thanks for the meal!"
+	chF3_P2 <- "Thanks for the meal!"
+
+	philosopher2Loop(chF2_P2, chF3_P2, timesEaten)
 }
 
-func philosopher3(chF2_P3, chF3_P3 chan string, timesEaten int, wg *sync.WaitGroup) {
+func philosopher3(chF3_P3, chF4_P3 chan string, timesEaten int, wg *sync.WaitGroup) {
 	defer wg.Done()
-	philosopher3Loop(chF2_P3, chF3_P3, timesEaten)
+	philosopher3Loop(chF3_P3, chF4_P3, timesEaten)
 }
 
-func philosopher3Loop(chF2_P3, chF3_P3 chan string, timesEaten int) {
+func philosopher3Loop(chF3_P3, chF4_P3 chan string, timesEaten int) {
 	fmt.Println("philosopher3: I am thinking")
 
 	if timesEaten >= 3 {
 		return
 	}
 
-	chF2_P3 <- "I want to eat!"
-	answer1 := <-chF2_P3
-
 	chF3_P3 <- "I want to eat!"
-	answer2 := <-chF3_P3
+	<-chF3_P3
 
-	if answer1 == "Of course!" && answer2 == "Of course!" {
-		fmt.Println("philosopher3: *eating*")
-		timesEaten++
-		time.Sleep(3 * time.Second)
-		chF2_P3 <- "Thanks for the meal!"
-		chF3_P3 <- "Thanks for the meal!"
-		philosopher3Loop(chF2_P3, chF3_P3, timesEaten)
-	} else if (answer1 == "Sorry, I am taken..." && answer2 == "Of course!") || (answer2 == "Sorry, I am taken..." && answer1 == "Of course!") {
-		if answer1 == "Sorry, I am taken..." && answer2 == "Of course!" {
-			chF3_P3 <- "Never mind then"
-		} else if answer2 == "Sorry, I am taken..." && answer1 == "Of course!" {
-			chF2_P3 <- "Never mind then"
-		}
-		time.Sleep(2 * time.Second)
-		philosopher3Loop(chF2_P3, chF3_P3, timesEaten)
-	} else {
-		time.Sleep(2 * time.Second)
-		philosopher3Loop(chF2_P3, chF3_P3, timesEaten)
-	}
+	chF4_P3 <- "I want to eat!"
+	<-chF4_P3
+
+	fmt.Println("philosopher3: *eating*")
+	timesEaten++
+	time.Sleep(3 * time.Second)
+	chF3_P3 <- "Thanks for the meal!"
+	chF4_P3 <- "Thanks for the meal!"
+
+	philosopher3Loop(chF3_P3, chF4_P3, timesEaten)
 }
 
-func philosopher4(chF3_P4, chF4_P4 chan string, timesEaten int, wg *sync.WaitGroup) {
+func philosopher4(chF4_P4, chF5_P4 chan string, timesEaten int, wg *sync.WaitGroup) {
 	defer wg.Done()
-	philosopher4Loop(chF3_P4, chF4_P4, timesEaten)
+	philosopher4Loop(chF4_P4, chF5_P4, timesEaten)
 }
 
-func philosopher4Loop(chF3_P4, chF4_P4 chan string, timesEaten int) {
+func philosopher4Loop(chF4_P4, chF5_P4 chan string, timesEaten int) {
 	fmt.Println("philosopher4: I am thinking")
 
 	if timesEaten >= 3 {
 		return
 	}
 
-	chF3_P4 <- "I want to eat!"
-	answer1 := <-chF3_P4
-
 	chF4_P4 <- "I want to eat!"
-	answer2 := <-chF4_P4
+	<-chF4_P4
 
-	if answer1 == "Of course!" && answer2 == "Of course!" {
-		fmt.Println("philosopher4: *eating*")
-		timesEaten++
-		time.Sleep(3 * time.Second)
-		chF3_P4 <- "Thanks for the meal!"
-		chF4_P4 <- "Thanks for the meal!"
-		philosopher4Loop(chF3_P4, chF4_P4, timesEaten)
-	} else if (answer1 == "Sorry, I am taken..." && answer2 == "Of course!") || (answer2 == "Sorry, I am taken..." && answer1 == "Of course!") {
-		if answer1 == "Sorry, I am taken..." && answer2 == "Of course!" {
-			chF4_P4 <- "Never mind then"
-		} else if answer2 == "Sorry, I am taken..." && answer1 == "Of course!" {
-			chF3_P4 <- "Never mind then"
-		}
-		time.Sleep(2 * time.Second)
-		philosopher4Loop(chF3_P4, chF4_P4, timesEaten)
-	} else {
-		time.Sleep(2 * time.Second)
-		philosopher4Loop(chF3_P4, chF4_P4, timesEaten)
-	}
+	chF5_P4 <- "I want to eat!"
+	<-chF5_P4
+
+	fmt.Println("philosopher4: *eating*")
+	timesEaten++
+	time.Sleep(3 * time.Second)
+	chF4_P4 <- "Thanks for the meal!"
+	chF5_P4 <- "Thanks for the meal!"
+
+	philosopher4Loop(chF4_P4, chF5_P4, timesEaten)
 }
 
 func philosopher5(chF1_P5, chF5_P5 chan string, timesEaten int, wg *sync.WaitGroup) {
@@ -401,29 +432,20 @@ func philosopher5Loop(chF1_P5, chF5_P5 chan string, timesEaten int) {
 		return
 	}
 
-	chF1_P5 <- "I want to eat!"
-	answerF1 := <-chF1_P5
-
+	// NOTE: order swapped relative to philosopher1–4 (asks for fork5 before fork1).
+	// This asymmetry breaks circular wait.
+	// PREVENTS DEADLOCK
 	chF5_P5 <- "I want to eat!"
-	answerF5 := <-chF5_P5
+	<-chF5_P5
 
-	if answerF1 == "Of course!" && answerF5 == "Of course!" {
-		fmt.Println("philosopher5: *eating*")
-		timesEaten++
-		time.Sleep(3 * time.Second)
-		chF5_P5 <- "Thanks for the meal!"
-		chF1_P5 <- "Thanks for the meal!"
-		philosopher5Loop(chF5_P5, chF1_P5, timesEaten)
-	} else if (answerF1 == "Sorry, I am taken..." && answerF5 == "Of course!") || (answerF5 == "Sorry, I am taken..." && answerF1 == "Of course!") {
-		if answerF1 == "Sorry, I am taken..." && answerF5 == "Of course!" {
-			chF5_P5 <- "Never mind then"
-		} else if answerF5 == "Sorry, I am taken..." && answerF1 == "Of course!" {
-			chF1_P5 <- "Never mind then"
-		}
-		time.Sleep(2 * time.Second)
-		philosopher5Loop(chF5_P5, chF1_P5, timesEaten)
-	} else {
-		time.Sleep(2 * time.Second)
-		philosopher5Loop(chF5_P5, chF1_P5, timesEaten)
-	}
+	chF1_P5 <- "I want to eat!"
+	<-chF1_P5
+
+	fmt.Println("philosopher5: *eating*")
+	timesEaten++
+	time.Sleep(3 * time.Second)
+	chF5_P5 <- "Thanks for the meal!"
+	chF1_P5 <- "Thanks for the meal!"
+
+	philosopher5Loop(chF1_P5, chF5_P5, timesEaten)
 }
