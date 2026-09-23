@@ -42,24 +42,19 @@ func main() {
 
 }
 
-// FORK DESIGN (identical for fork1–fork5):
-// Each fork tracks whether it is currently free with the "available" variable and whether it´s
-// neighbors are waiting with the "pendingP_" variable. When a
-// fork is busy, it does NOT reject the requesting philosopher. Instead it records the
-// request as pending and sends no reply. The philosopher's receive (<-chX_PY)
-// therefore blocks until the fork later becomes free and actively sends
-// "Of course!" to the waiting neighbor (see the "Thanks for the meal!" case).
-// This implements philosophers HOLDING a fork while WAITING for the other.
-// Coffman's "hold and wait" condition IS present in this design.
-// Deadlock is instead prevented by breaking the "circular wait" condition.
-// see the comment in philosopher5Loop.
-
-// philosopher1–philosopher4 all request their forks in the same fixed order
-// (their lower-numbered neighbor fork first, then the higher-numbered one).
-// Because forks now implement hold-and-wait, a fully symmetric ring where 
-// everyone requests forks in the same rotational order risks circular wait. 
-// philosopher5 breaks this symmetry by requesting in the opposite order.
-// See philosopher5Loop for why that prevents deadlock.
+// DEADLOCK PREVENTION VIA "Circular wait":
+// Forks are numbered F1–F5. Every philosopher requests whichever
+// of its two adjacent forks has the LOWER index first, and the higher one
+// second. philosopher1–philosopher4 do this naturally (F_i before F_{i+1}).
+// philosopher5's two forks are F1 and F5 — since F1 is the lower index, it
+// requests F1 first too, exactly matching the same global rule.
+// Because ALL FIVE philosophers follow one consistent global ordering
+// (never requesting a lower-indexed fork while already holding a
+// higher-indexed one), a full circular wait around the table is
+// impossible: any wait-for cycle would require some
+// philosopher to hold their higher fork while still waiting for their
+// lower one, which the ordering rule forbids. This breaks Coffman's
+// "circular wait" condition even though "hold and wait" is present.
 
 func fork1(chF1_P1, chF1_P5 chan string) {
 	available := true
@@ -431,15 +426,12 @@ func philosopher5Loop(chF1_P5, chF5_P5 chan string, timesEaten int) {
 	if timesEaten >= 3 {
 		return
 	}
-
-	// NOTE: order swapped relative to philosopher1–4 (asks for fork5 before fork1).
-	// This asymmetry breaks circular wait.
-	// PREVENTS DEADLOCK
-	chF5_P5 <- "I want to eat!"
-	<-chF5_P5
-
+	
 	chF1_P5 <- "I want to eat!"
 	<-chF1_P5
+
+	chF5_P5 <- "I want to eat!"
+	<-chF5_P5
 
 	fmt.Println("philosopher5: *eating*")
 	timesEaten++
