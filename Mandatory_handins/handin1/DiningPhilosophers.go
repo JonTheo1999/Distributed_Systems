@@ -62,8 +62,10 @@ func fork1(chF1_P1, chF1_P5 chan string) {
 				}
 			} else if msg1 == "Never mind then" {
 				available = true
+
 			} else if msg1 == "Thanks for the meal!" {
 				available = true
+
 			}
 
 		case msg5 := <-chF1_P5:
