@@ -45,20 +45,15 @@ func main() {
 // DEADLOCK PREVENTION VIA "Circular wait":
 // Forks are numbered F1–F5. Every philosopher requests whichever
 // of its two adjacent forks has the LOWER index first, and the higher one
-// second. philosopher1–philosopher4 do this naturally (F_i before F_{i+1}).
+// second (meaning that a philosopher always picks the left fork first).
+// philosopher1–philosopher4 do this naturally (F_i before F_{i+1}).
 // philosopher5's two forks are F1 and F5 — since F1 is the lower index, it
-// requests F1 first too, exactly matching the same global rule.
-// Because ALL FIVE philosophers follow one consistent global ordering
-// (never requesting a lower-indexed fork while already holding a
-// higher-indexed one), a full circular wait around the table is
-// impossible: any wait-for cycle would require some
-// philosopher to hold their higher fork while still waiting for their
-// lower one, which the ordering rule forbids. This breaks Coffman's
-// "circular wait" condition even though "hold and wait" is present.
+// requests F1 first too, HOWEVER fork1 is philosopher5's right fork. Not left.
+// This breaks Coffman's "circular wait" condition even though "hold and wait" is present.
 
 func fork1(chF1_P1, chF1_P5 chan string) {
 	available := true
-	pendingP1 := false 
+	pendingP1 := false
 	pendingP5 := false
 
 	for {
@@ -110,7 +105,7 @@ func fork1(chF1_P1, chF1_P5 chan string) {
 
 func fork2(chF2_P1, chF2_P2 chan string) {
 	available := true
-	pendingP1 := false 
+	pendingP1 := false
 	pendingP2 := false
 
 	for {
@@ -320,7 +315,7 @@ func philosopher1Loop(chF1_P1, chF2_P1 chan string, timesEaten int) {
 	}
 
 	chF1_P1 <- "I want to eat!"
-	<-chF1_P1        
+	<-chF1_P1
 
 	chF2_P1 <- "I want to eat!"
 	<-chF2_P1
@@ -426,7 +421,7 @@ func philosopher5Loop(chF1_P5, chF5_P5 chan string, timesEaten int) {
 	if timesEaten >= 3 {
 		return
 	}
-	
+
 	chF1_P5 <- "I want to eat!"
 	<-chF1_P5
 
