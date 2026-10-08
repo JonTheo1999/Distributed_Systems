@@ -1,1 +1,14 @@
+syntax = "proto3";
 
+package chitchat;
+option go_package = "gm/grpc";
+
+service ChitChat {
+  rpc Join(/* ? */) returns (stream /* ? */);
+  rpc Publish(/* ? */) returns (/* ? */);
+  rpc Leave(/* ? */) returns (/* ? */);
+}
+
+message /* ... */ {
+  // felter
+}
