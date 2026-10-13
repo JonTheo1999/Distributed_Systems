@@ -1,1 +1,40 @@
+syntax = "proto3";
 
+package chitchat;
+option go_package = "gm/grpc";
+
+service ChitChat {
+  rpc Join(JoinRequest) returns (stream Broadcast);
+  rpc Publish(PublishRequest) returns (PublishReply);
+  rpc Leave(LeaveRequest) returns (LeaveReply);
+}
+
+message JoinRequest {
+  string username = 1;
+  int64 timestamp = 2;
+}
+
+message Broadcast {
+  string username = 1;
+  int64 timestamp = 2;
+  string msg_content = 3;
+}
+
+message PublishRequest {
+  string username = 1;
+  int64 timestamp = 2;
+  string msg_content = 3;
+}
+
+message PublishReply {
+  int64 timestamp = 1;
+}
+
+message LeaveRequest {
+  string username = 1;
+  int64 timestamp = 2;
+}
+
+message LeaveReply {
+  int64 timestamp = 1;
+}
