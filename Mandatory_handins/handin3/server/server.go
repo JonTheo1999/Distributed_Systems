@@ -8,6 +8,7 @@ import (
 	"net"
 	"log"
 	"fmt"
+	"unicode/utf8"
 )
 
 type chitChatServer struct {
@@ -56,9 +57,9 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 	for name, ch :=  range s.userChannels {
 		select {
 		case ch <- msg:
-			log.Printf("[Server] %s received broadcast", name)
+			log.Printf("[Server] [Broadcast]  %s received broadcast", name)
 		default:
-			log.Printf("[Server] %s did not receive broadcast. Channel is full", name)
+			log.Printf("[Server] [Broadcast]  %s did not receive broadcast. Channel is full", name)
 		}
 	}
 	s.lock.Unlock()
@@ -95,7 +96,40 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 }
 
 func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest) (pubRep *pb.PublishReply, e error) {
-	return nil, nil
+	if utf8.RuneCountInString(pubReq.MsgContent) > 128 || pubReq.MsgContent == "" {
+		log.Printf("[Server] [Publish] Message is too long or empty")
+		return nil, fmt.Errorf("Message is invalid")
+	}
+	
+	s.lock.Lock()
+	s.clock = max(s.clock, pubReq.Timestamp) + 1
+	s.clock++
+
+	msg := &pb.Broadcast{
+		Username: pubReq.Username,
+		Timestamp: s.clock,
+		MsgContent: pubReq.MsgContent,
+	}
+
+	serTs := s.clock
+
+	for name, ch :=  range s.userChannels {
+		select {
+		case ch <- msg:
+			log.Printf("[Server] [Broadcast]  %s received broadcast", name)
+		default:
+			log.Printf("[Server] [Broadcast]  %s did not receive broadcast. Channel is full", name)
+		}
+	}
+	s.lock.Unlock()
+
+	log.Printf("[Server] [Publish] %s sent message: %s; at logical time %d", pubReq.Username, pubReq.MsgContent, serTs)
+
+	reply := &pb.PublishReply{
+		Timestamp: serTs,
+	}
+	
+	return reply, nil
 }
 
 func (s * chitChatServer) Leave(ctx context.Context, leaveReq *pb.LeaveRequest) (leaveRep *pb.LeaveReply, e error) {
