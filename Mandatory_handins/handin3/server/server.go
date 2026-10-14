@@ -133,5 +133,43 @@ func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest
 }
 
 func (s * chitChatServer) Leave(ctx context.Context, leaveReq *pb.LeaveRequest) (leaveRep *pb.LeaveReply, e error) {
-	return nil, nil
+	s.lock.Lock()
+	ch, ok := s.userChannels[leaveReq.Username]
+
+		if !ok {
+			log.Printf("[Server] [Leave] rejected: %s is not in the chat", leaveReq.GetUsername())
+			s.lock.Unlock()
+			return nil, fmt.Errorf("User does not exist")
+		} 
+
+	delete(s.userChannels, leaveReq.Username)
+	close(ch)
+
+	s.clock = max(s.clock, leaveReq.Timestamp) + 1
+	s.clock++
+	serTs := s.clock
+
+	msg := &pb.Broadcast{
+		Username: "Server",
+		Timestamp: serTs,
+		MsgContent: fmt.Sprintf("Participant %s left Chit Chat at logical time %d", leaveReq.GetUsername(), serTs),
+	}
+
+	for name, ch :=  range s.userChannels {
+		select {
+		case ch <- msg:
+			log.Printf("[Server] [Broadcast]  %s received broadcast", name)
+		default:
+			log.Printf("[Server] [Broadcast]  %s did not receive broadcast. Channel is full", name)
+		}
+	}
+	s.lock.Unlock()
+
+	log.Printf("[Server] [Leave] %s left Chit Chat at logical time %d", leaveReq.GetUsername(), serTs)
+
+	reply := &pb.LeaveReply{
+		Timestamp: serTs,
+	}
+
+	return reply, nil
 }
