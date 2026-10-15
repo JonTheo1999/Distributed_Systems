@@ -54,22 +54,22 @@ func main() {
 }
 
 func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingServer[pb.Broadcast]) (e error) {
-    userCh := make(chan *pb.Broadcast, 50)
+    userCh := make(chan *pb.Broadcast, 50) // klientens personlige kanal. Kan indeholde op til 50 beskeder. kan ændres
 
-	s.lock.Lock()
-	s.userChannels[req.GetUsername()] = userCh
-	s.clock = max(s.clock, req.Timestamp) + 1
-	s.clock++
+	s.lock.Lock() // Låser således at andre goroutines ikke kan pille ved serverens felter før vi er færdige
+	s.userChannels[req.GetUsername()] = userCh // putter brugeren og brugerens kanal i mappet (hashmap)
+	s.clock = max(s.clock, req.Timestamp) + 1 // modtag-reglen in action. serveren modtager timestamp fra klienten og sikre at højeste værdi altid er serverens ur.
+	s.clock++ // tæller serverens ur op
 
-	msg := &pb.Broadcast{
+	msg := &pb.Broadcast{ // Bygger den besked, der skal broadcastes til alle brugere som er inde i chitchat
 		Username: "Server",
 		Timestamp: s.clock,
 		MsgContent: fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", req.GetUsername(), s.clock),
 	}
 
-	log.Printf("[Server] [Join] %s joined at logical time %d", req.GetUsername(), s.clock)
+	log.Printf("[Server] [Join] %s joined at logical time %d", req.GetUsername(), s.clock) // Logger join hændelsen
 
-	for name, ch :=  range s.userChannels {
+	for name, ch :=  range s.userChannels { // for-loop der sender broadcast-besked ud til alle brugers kanaler
 		select {
 		case ch <- msg:
 			log.Printf("[Server] [Broadcast]  %s received broadcast", name)
@@ -77,17 +77,17 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 			log.Printf("[Server] [Broadcast]  %s did not receive broadcast. Channel is full", name)
 		}
 	}
-	s.lock.Unlock()
+	s.lock.Unlock() // Låser op igen så andre goroutines kan bruge serverens felter
 
-	for {
+	for { // Dette er en uendlig løkke som bliver ved så længe at brugeren har forbindelse til chitchat
 		select {
-		case msg, ok := <- userCh:
-			if !ok {
+		case msg, ok := <- userCh: // Modtager ny besked i brugerens kanal
+			if !ok { // kanalen er lukket og brugeren har med vilje forladt chitchat
 				return nil
-			} else {
+			} else { // Almindelig besked sendt til brugeren
 				err := stream.Send(msg)
 		
-				if err != nil {
+				if err != nil { // Hvis brugeren forbindelse fejler, logger vi det og fjerne brugeren fra listen af brugere
 					log.Printf("[Server] [Disconnect] %s disconnected: %v", req.GetUsername(), err)
 
 					s.lock.Lock()
@@ -96,10 +96,10 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 					return err
 				}
 
-				log.Printf("[Server] [Delivery] delivered to %s: from=%s time=%d msg=%q",
+				log.Printf("[Server] [Delivery] delivered to %s: from=%s time=%d msg=%q", // logger hvis beskeden kom igennem til brugeren
     			req.GetUsername(), msg.Username, msg.Timestamp, msg.MsgContent)
 			}
-		case <- stream.Context().Done():
+		case <- stream.Context().Done(): // forbindelsen døde. Her fanger vi disconnecten og rydder op
 			s.lock.Lock()
 			delete(s.userChannels, req.GetUsername())
 			log.Printf("[Server] [Disconnect] %s left the chat at logical time %d", req.GetUsername(), s.clock)
