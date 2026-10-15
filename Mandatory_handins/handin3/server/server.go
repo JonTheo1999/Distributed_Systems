@@ -111,24 +111,24 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 }
 
 func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest) (pubRep *pb.PublishReply, e error) {
-	if utf8.RuneCountInString(pubReq.MsgContent) > 128 || pubReq.MsgContent == "" {
+	if utf8.RuneCountInString(pubReq.MsgContent) > 128 || pubReq.MsgContent == "" { // tjekker om en besked er for lang eller tom
 		log.Printf("[Server] [Publish] Message sent by %s is too long or empty", pubReq.GetUsername())
 		return nil, fmt.Errorf("Message is invalid")
 	}
 	
-	s.lock.Lock()
-	s.clock = max(s.clock, pubReq.Timestamp) + 1
-	s.clock++
+	s.lock.Lock() // Låser således at andre goroutines ikke kan pille ved serverens felter før vi er færdige
+	s.clock = max(s.clock, pubReq.Timestamp) + 1 // modtag-reglen in action. serveren modtager timestamp fra klienten og sikre at højeste værdi altid er serverens ur.
+	s.clock++ // tæller serverens ur op (send-reglen)
 
-	msg := &pb.Broadcast{
+	msg := &pb.Broadcast{ // Bygger den besked som en bruger gerne vil sende til alle andre brugere som er inde i chitchat
 		Username: pubReq.Username,
 		Timestamp: s.clock,
 		MsgContent: pubReq.MsgContent,
 	}
 
-	serTs := s.clock
+	serTs := s.clock // gemmer serverens tid i lokal variabel
 
-	for name, ch :=  range s.userChannels {
+	for name, ch :=  range s.userChannels { // for-loop der sender besked ud til alle brugers kanaler
 		select {
 		case ch <- msg:
 			log.Printf("[Server] [Broadcast]  %s received broadcast", name)
@@ -136,11 +136,11 @@ func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest
 			log.Printf("[Server] [Broadcast]  %s did not receive broadcast. Channel is full", name)
 		}
 	}
-	s.lock.Unlock()
+	s.lock.Unlock() // Låser op igen så andre goroutines kan bruge serverens felter
 
-	log.Printf("[Server] [Publish] %s sent message: %s; at logical time %d", pubReq.GetUsername(), pubReq.MsgContent, serTs)
+	log.Printf("[Server] [Publish] %s sent message: %s; at logical time %d", pubReq.GetUsername(), pubReq.MsgContent, serTs) // Logger at beskeden blev sendt
 
-	reply := &pb.PublishReply{
+	reply := &pb.PublishReply{ // svarer afsenderen at beskeden blev sendt. sender timestamp så klient kan opdatere sit ur
 		Timestamp: serTs,
 	}
 	
