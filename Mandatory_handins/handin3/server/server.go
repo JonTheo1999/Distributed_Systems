@@ -120,7 +120,7 @@ func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest
 	s.clock = max(s.clock, pubReq.Timestamp) + 1 // modtag-reglen in action. serveren modtager timestamp fra klienten og sikre at højeste værdi altid er serverens ur.
 	s.clock++ // tæller serverens ur op (send-reglen)
 
-	msg := &pb.Broadcast{ // Bygger den besked som en bruger gerne vil sende til alle andre brugere som er inde i chitchat
+	msg := &pb.Broadcast{ // Bygger den besked som en bruger gerne vil sende til alle brugere som er inde i chitchat
 		Username: pubReq.Username,
 		Timestamp: s.clock,
 		MsgContent: pubReq.MsgContent,
@@ -144,33 +144,33 @@ func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest
 		Timestamp: serTs,
 	}
 	
-	return reply, nil
+	return reply, nil // sender reply til klienten
 }
 
 func (s * chitChatServer) Leave(ctx context.Context, leaveReq *pb.LeaveRequest) (leaveRep *pb.LeaveReply, e error) {
-	s.lock.Lock()
-	ch, ok := s.userChannels[leaveReq.Username]
+	s.lock.Lock() // Låser således at andre goroutines ikke kan pille ved serverens felter før vi er færdige
+	ch, ok := s.userChannels[leaveReq.Username] // Slår brugeren, som anmoder om at forlade chitchat, op
 
-		if !ok {
+		if !ok { // Hvis brugeren ikke findes i listen over brugere, returnere vi med en fejlbesked
 			log.Printf("[Server] [Leave] rejected: %s is not in the chat", leaveReq.GetUsername())
 			s.lock.Unlock()
 			return nil, fmt.Errorf("User does not exist")
 		} 
 
-	delete(s.userChannels, leaveReq.Username)
-	close(ch)
+	delete(s.userChannels, leaveReq.Username) // Vi sletter brugeren fra chitchats liste over medlemmer
+	close(ch) // vi lukker brugerens kanal
 
-	s.clock = max(s.clock, leaveReq.Timestamp) + 1
-	s.clock++
-	serTs := s.clock
+	s.clock = max(s.clock, leaveReq.Timestamp) + 1 // modtag-reglen in action. serveren modtager timestamp fra klienten og sikre at højeste værdi altid er serverens ur.
+	s.clock++ // tæller serverens ur op (send-reglen)
+	serTs := s.clock // gemmer serverens tid i lokal variabel
 
-	msg := &pb.Broadcast{
+	msg := &pb.Broadcast{ // Bygger den besked, der skal broadcastes til alle brugere som er inde i chitchat
 		Username: "Server",
 		Timestamp: serTs,
 		MsgContent: fmt.Sprintf("Participant %s left Chit Chat at logical time %d", leaveReq.GetUsername(), serTs),
 	}
 
-	for name, ch :=  range s.userChannels {
+	for name, ch :=  range s.userChannels { // for-loop der sender besked ud til alle brugers kanaler
 		select {
 		case ch <- msg:
 			log.Printf("[Server] [Broadcast]  %s received broadcast", name)
@@ -178,13 +178,13 @@ func (s * chitChatServer) Leave(ctx context.Context, leaveReq *pb.LeaveRequest) 
 			log.Printf("[Server] [Broadcast]  %s did not receive broadcast. Channel is full", name)
 		}
 	}
-	s.lock.Unlock()
+	s.lock.Unlock() // Låser op igen så andre goroutines kan bruge serverens felter
 
-	log.Printf("[Server] [Leave] %s left Chit Chat at logical time %d", leaveReq.GetUsername(), serTs)
+	log.Printf("[Server] [Leave] %s left Chit Chat at logical time %d", leaveReq.GetUsername(), serTs) // logger beskeden om at en bruger forlod chatten
 
-	reply := &pb.LeaveReply{
+	reply := &pb.LeaveReply{ // svarer afsenderen at vedkommende har forladt chitchat. sender timestamp så klient kan opdatere sit ur
 		Timestamp: serTs,
 	}
 
-	return reply, nil
+	return reply, nil // sender reply til klienten
 }
