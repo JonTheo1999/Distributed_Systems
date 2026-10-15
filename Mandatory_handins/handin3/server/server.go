@@ -9,10 +9,12 @@ import (
 	"log"
 	"fmt"
 	"unicode/utf8"
+	"os"
+	"os/signal"
 )
 
 type chitChatServer struct {
-    pb.UnimplementedChitChatServer   // påkrævet af gRPC, se nedenfor
+    pb.UnimplementedChitChatServer   // påkrævet af gRPC
 
 	userChannels map[string]chan *pb.Broadcast
 	lock sync.Mutex
@@ -20,24 +22,35 @@ type chitChatServer struct {
 }
 
 func main() {
-	 chitChatSer := &chitChatServer{userChannels: make(map[string]chan *pb.Broadcast)}
-	 host := "localhost:5000"
+	 chitChatSer := &chitChatServer{userChannels: make(map[string]chan *pb.Broadcast)}  // Server instansen. Har et map over brugere som peger på hver deres kanal
+	 host := "localhost:5000" // Statisk host. kan ændres senere
 
-	 listener, err := net.Listen("tcp", host)
+	 listener, err := net.Listen("tcp", host) // Dette er "døren" som nye forbindelser banker på
 
-	if err != nil {
-	log.Fatalf("[Server] failed to listen on port %s: %v", host, err)
+	if err != nil { // Sikkerhed hvis "døren" ikke kan åbnes
+		log.Fatalf("[Server] failed to listen on port %s: %v", host, err)
 	}
 
-	gRPCser := grpc.NewServer()
+	gRPCser := grpc.NewServer() // Laver gRPC-serveren
 
-	pb.RegisterChitChatServer(gRPCser, chitChatSer)
+	pb.RegisterChitChatServer(gRPCser, chitChatSer) // forbinder vores chat på vores gRPC-server
 
-	log.Println("[Server] is listening on: ", host)
+	log.Printf("[Server] [Startup] Server is listening on %s", host) // logger opstart
 
-	if err := gRPCser.Serve(listener); err != nil {
-		log.Fatalf("[Server] stopped working: %v", err)
-	}
+	sigCh := make(chan os.Signal, 1) // Fanger nedlukning af serveren således at fx Ctrl+C "lukker pænt" 
+  	signal.Notify(sigCh, os.Interrupt) // og indsætter det i sigCh kanalen 
+  	
+	go func() { // lille anonym funktion. Denne funktion kører i baggrunden og venter bare på at noget kommer ind på sigCh kanalen
+      <-sigCh
+    	log.Printf("[Server] [Shutdown] Server is shutting down") // logger nedlukning
+		gRPCser.Stop() // lukker ALLE forbindelser
+  	}()
+
+	err = gRPCser.Serve(listener) // serveren tager imod forbindelser. Lægges i lokal variabel for at fange fejl. SE NEDEUNDER
+
+	if err != nil { // hvis serveren fejler, fanger vi og udprinter pænt
+    	log.Fatalf("[Server] stopped working: %v", err)
+	}	
 }
 
 func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingServer[pb.Broadcast]) (e error) {
@@ -53,6 +66,8 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 		Timestamp: s.clock,
 		MsgContent: fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", req.GetUsername(), s.clock),
 	}
+
+	log.Printf("[Server] [Join] %s joined at logical time %d", req.GetUsername(), s.clock)
 
 	for name, ch :=  range s.userChannels {
 		select {
@@ -73,7 +88,7 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 				err := stream.Send(msg)
 		
 				if err != nil {
-					log.Printf("[Server] %s disconnected: %v", req.GetUsername(), err)
+					log.Printf("[Server] [Disconnect] %s disconnected: %v", req.GetUsername(), err)
 
 					s.lock.Lock()
 					delete(s.userChannels, req.GetUsername())
@@ -87,7 +102,7 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 		case <- stream.Context().Done():
 			s.lock.Lock()
 			delete(s.userChannels, req.GetUsername())
-			log.Printf("[Server] %s left the chat at logical time %d", req.GetUsername(), s.clock)
+			log.Printf("[Server] [Disconnect] %s left the chat at logical time %d", req.GetUsername(), s.clock)
 			s.lock.Unlock()
 			
 			return stream.Context().Err()
@@ -97,7 +112,7 @@ func (s *chitChatServer) Join(req *pb.JoinRequest, stream grpc.ServerStreamingSe
 
 func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest) (pubRep *pb.PublishReply, e error) {
 	if utf8.RuneCountInString(pubReq.MsgContent) > 128 || pubReq.MsgContent == "" {
-		log.Printf("[Server] [Publish] Message is too long or empty")
+		log.Printf("[Server] [Publish] Message sent by %s is too long or empty", pubReq.GetUsername())
 		return nil, fmt.Errorf("Message is invalid")
 	}
 	
@@ -123,7 +138,7 @@ func (s * chitChatServer) Publish(ctx context.Context, pubReq *pb.PublishRequest
 	}
 	s.lock.Unlock()
 
-	log.Printf("[Server] [Publish] %s sent message: %s; at logical time %d", pubReq.Username, pubReq.MsgContent, serTs)
+	log.Printf("[Server] [Publish] %s sent message: %s; at logical time %d", pubReq.GetUsername(), pubReq.MsgContent, serTs)
 
 	reply := &pb.PublishReply{
 		Timestamp: serTs,
