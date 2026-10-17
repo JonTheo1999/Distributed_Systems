@@ -188,7 +188,7 @@ func (c *client) leave() {
         if err != nil { 
             log.Printf("[Client] [Leave] Leave by %s failed: %v", c.username, err) // Leave fejlede fx fordi serveren er nede.
         } else {
-            // vi opdatere klients ur, da det at serveren fjerner brugeren er en hændelse.
+            // vi opdatere klients ur, da det at serveren fjerner brugeren er en hændelse fra serveren.
             c.lock.Lock()
             c.clock = max(c.clock, reply.GetTimestamp()) + 1
             replyTs := c.clock
