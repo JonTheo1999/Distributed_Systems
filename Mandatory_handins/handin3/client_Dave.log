@@ -18,3 +18,11 @@
 2026/10/19 08:53:37 [Client] [Received] stream closed
 2026/10/19 08:53:37 [Client] [Leave] Dave left ChitChat at logical time 38, confirmed 41
 2026/10/19 08:53:37 [Client] [Shutdown]: Dave 
+2026/10/19 12:35:24 [Client] [Startup] dave is online
+2026/10/19 12:35:24 [Client] [Join] dave joined ChitChat at logical time 1
+2026/10/19 12:35:24 [Client] [Received] dave received message: Participant dave joined Chit Chat at logical time 3; From Server at logical time 3
+2026/10/19 12:35:51 [Client] [Received] dave received message: Participant henry joined Chit Chat at logical time 5; From Server at logical time 5
+2026/10/19 12:38:25 [Client] [Received] dave received message: hi there; From henry at logical time 9
+2026/10/19 12:38:54 [Client] [Received] stream closed
+2026/10/19 12:38:54 [Client] [Leave] dave left ChitChat at logical time 11, confirmed 14
+2026/10/19 12:38:54 [Client] [Shutdown]: dave 
