@@ -1,0 +1,18 @@
+2026/10/19 08:11:29 [Client] [Startup] Dave is online
+2026/10/19 08:11:30 [Client] [Join] Dave joined ChitChat at logical time 1
+2026/10/19 08:11:30 [Client] [Received] Dave received message: Participant Dave joined Chit Chat at logical time 3; From Server at logical time 3
+2026/10/19 08:11:49 [Client] [Received] Dave received message: Participant Evan joined Chit Chat at logical time 5; From Server at logical time 5
+2026/10/19 08:12:01 [Client] [Received] Dave received message: Hey Evan, are we still on for dinner tonight?; From Dave at logical time 9
+2026/10/19 08:12:01 [Client] [Publish] Hey Evan, are we still on for dinner tonight?; Was sent by Dave at logical time 7, confirmed at 11
+2026/10/19 08:12:30 [Client] [Received] Dave received message: Yes! How about that new café downtown at 7?; From Evan at logical time 13
+2026/10/19 08:12:57 [Client] [Received] Dave received message: Sounds great. Should I invite Sarah too?; From Dave at logical time 17
+2026/10/19 08:12:57 [Client] [Publish] Sounds great. Should I invite Sarah too?; Was sent by Dave at logical time 15, confirmed at 19
+2026/10/19 08:14:05 [Client] [Received] Dave received message: Sure, the more the merrier. Could you invite her to the chat? I'll book a table for three.; From Evan at logical time 21
+2026/10/19 08:14:58 [Client] [Received] Dave received message: Participant Sarah joined Chit Chat at logical time 23; From Server at logical time 23
+2026/10/19 08:15:16 [Client] [Received] Dave received message: Hey guys!; From Sarah at logical time 27
+2026/10/19 08:16:33 [Client] [Publish] Message by Dave is too long or empty
+2026/10/19 08:16:57 [Client] [Received] Dave received message: Oops, that was too long. Gotta go, see you at 7!; From Dave at logical time 31
+2026/10/19 08:16:57 [Client] [Publish] Oops, that was too long. Gotta go, see you at 7!; Was sent by Dave at logical time 29, confirmed at 33
+2026/10/19 08:17:10 [Client] [Received] stream closed
+2026/10/19 08:17:10 [Client] [Leave] Dave left ChitChat at logical time 34, confirmed 37
+2026/10/19 08:17:10 [Client] [Shutdown]: Dave 

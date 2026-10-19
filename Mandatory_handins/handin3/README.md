@@ -42,15 +42,15 @@ The server listens on `localhost:5000`.
 Open a new terminal for each client and give each client a unique username:
 
 ```
-go run ./client Alice
+go run ./client Dave
 ```
 
 ```
-go run ./client Bob
+go run ./client Evan
 ```
 
 ```
-go run ./client Charlie
+go run ./client Sarah
 ```
 
 ### 3. Chat
