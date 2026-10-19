@@ -1,0 +1,12 @@
+2026/10/19 08:52:49 [Client] [Startup] Sarah is online
+2026/10/19 08:52:49 [Client] [Join] Sarah joined ChitChat at logical time 1
+2026/10/19 08:52:49 [Client] [Received] Sarah received message: Participant Sarah joined Chit Chat at logical time 27; From Server at logical time 27
+2026/10/19 08:53:01 [Client] [Publish] hey guys!; Was sent by Sarah at logical time 29, confirmed at 33
+2026/10/19 08:53:01 [Client] [Received] Sarah received message: hey guys!; From Sarah at logical time 31
+2026/10/19 08:53:25 [Client] [Received] Sarah received message: Oops, that was too long. Gotta go, see you at 7!; From Dave at logical time 35
+2026/10/19 08:53:37 [Client] [Received] Sarah received message: Participant Dave left Chit Chat at logical time 40; From Server at logical time 40
+2026/10/19 08:53:54 [Client] [Publish] alright. see you tonight!; Was sent by Sarah at logical time 42, confirmed at 45
+2026/10/19 08:53:54 [Client] [Received] Sarah received message: alright. see you tonight!; From Sarah at logical time 44
+2026/10/19 08:54:02 [Client] [Received] stream closed
+2026/10/19 08:54:02 [Client] [Leave] Sarah left ChitChat at logical time 47, confirmed 50
+2026/10/19 08:54:02 [Client] [Shutdown]: Sarah 

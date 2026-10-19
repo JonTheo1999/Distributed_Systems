@@ -1,0 +1,20 @@
+2026/10/19 08:50:49 [Client] [Startup] Dave is online
+2026/10/19 08:50:49 [Client] [Join] Dave joined ChitChat at logical time 1
+2026/10/19 08:50:49 [Client] [Received] Dave received message: Participant Dave joined Chit Chat at logical time 3; From Server at logical time 3
+2026/10/19 08:50:57 [Client] [Received] Dave received message: Participant Evan joined Chit Chat at logical time 5; From Server at logical time 5
+2026/10/19 08:51:17 [Client] [Publish] Hey Evan, are we still on for dinner tonight?; Was sent by Dave at logical time 7, confirmed at 11
+2026/10/19 08:51:17 [Client] [Received] Dave received message: Hey Evan, are we still on for dinner tonight?; From Dave at logical time 9
+2026/10/19 08:51:30 [Client] [Received] Dave received message: Yes! How about that new café downtown at 7?; From Evan at logical time 13
+2026/10/19 08:51:40 [Client] [Publish] Sounds great. Should I invite Sarah too?; Was sent by Dave at logical time 15, confirmed at 19
+2026/10/19 08:51:40 [Client] [Received] Dave received message: Sounds great. Should I invite Sarah too?; From Dave at logical time 17
+2026/10/19 08:52:25 [Client] [Received] Dave received message: Sure, the more the merrier. Could you invite her to the chat? I'll book a table for three.; From Evan at logical time 21
+2026/10/19 08:52:45 [Client] [Received] Dave received message: Done!; From Dave at logical time 25
+2026/10/19 08:52:45 [Client] [Publish] Done!; Was sent by Dave at logical time 23, confirmed at 27
+2026/10/19 08:52:49 [Client] [Received] Dave received message: Participant Sarah joined Chit Chat at logical time 27; From Server at logical time 27
+2026/10/19 08:53:01 [Client] [Received] Dave received message: hey guys!; From Sarah at logical time 31
+2026/10/19 08:53:16 [Client] [Publish] Message by Dave is too long or empty
+2026/10/19 08:53:25 [Client] [Publish] Oops, that was too long. Gotta go, see you at 7!; Was sent by Dave at logical time 33, confirmed at 36
+2026/10/19 08:53:25 [Client] [Received] Dave received message: Oops, that was too long. Gotta go, see you at 7!; From Dave at logical time 35
+2026/10/19 08:53:37 [Client] [Received] stream closed
+2026/10/19 08:53:37 [Client] [Leave] Dave left ChitChat at logical time 38, confirmed 41
+2026/10/19 08:53:37 [Client] [Shutdown]: Dave 

@@ -1,0 +1,70 @@
+2026/10/19 08:50:36 [Server] [Startup] Server is listening on localhost:5000
+2026/10/19 08:50:49 [Server] [Join] Dave joined at logical time 3
+2026/10/19 08:50:49 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:50:49 [Server] [Delivery] delivered to Dave: from=Server time=3 msg="Participant Dave joined Chit Chat at logical time 3"
+2026/10/19 08:50:57 [Server] [Join] Evan joined at logical time 5
+2026/10/19 08:50:57 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:50:57 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:50:57 [Server] [Delivery] delivered to Evan: from=Server time=5 msg="Participant Evan joined Chit Chat at logical time 5"
+2026/10/19 08:50:57 [Server] [Delivery] delivered to Dave: from=Server time=5 msg="Participant Evan joined Chit Chat at logical time 5"
+2026/10/19 08:51:17 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:51:17 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:51:17 [Server] [Delivery] delivered to Dave: from=Dave time=9 msg="Hey Evan, are we still on for dinner tonight?"
+2026/10/19 08:51:17 [Server] [Publish] Dave sent message: Hey Evan, are we still on for dinner tonight?; at logical time 9
+2026/10/19 08:51:17 [Server] [Delivery] delivered to Evan: from=Dave time=9 msg="Hey Evan, are we still on for dinner tonight?"
+2026/10/19 08:51:30 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:51:30 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:51:30 [Server] [Publish] Evan sent message: Yes! How about that new café downtown at 7?; at logical time 13
+2026/10/19 08:51:30 [Server] [Delivery] delivered to Evan: from=Evan time=13 msg="Yes! How about that new café downtown at 7?"
+2026/10/19 08:51:30 [Server] [Delivery] delivered to Dave: from=Evan time=13 msg="Yes! How about that new café downtown at 7?"
+2026/10/19 08:51:40 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:51:40 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:51:40 [Server] [Publish] Dave sent message: Sounds great. Should I invite Sarah too?; at logical time 17
+2026/10/19 08:51:40 [Server] [Delivery] delivered to Evan: from=Dave time=17 msg="Sounds great. Should I invite Sarah too?"
+2026/10/19 08:51:40 [Server] [Delivery] delivered to Dave: from=Dave time=17 msg="Sounds great. Should I invite Sarah too?"
+2026/10/19 08:52:25 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:52:25 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:52:25 [Server] [Publish] Evan sent message: Sure, the more the merrier. Could you invite her to the chat? I'll book a table for three.; at logical time 21
+2026/10/19 08:52:25 [Server] [Delivery] delivered to Evan: from=Evan time=21 msg="Sure, the more the merrier. Could you invite her to the chat? I'll book a table for three."
+2026/10/19 08:52:25 [Server] [Delivery] delivered to Dave: from=Evan time=21 msg="Sure, the more the merrier. Could you invite her to the chat? I'll book a table for three."
+2026/10/19 08:52:45 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:52:45 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:52:45 [Server] [Publish] Dave sent message: Done!; at logical time 25
+2026/10/19 08:52:45 [Server] [Delivery] delivered to Evan: from=Dave time=25 msg="Done!"
+2026/10/19 08:52:45 [Server] [Delivery] delivered to Dave: from=Dave time=25 msg="Done!"
+2026/10/19 08:52:49 [Server] [Join] Sarah joined at logical time 27
+2026/10/19 08:52:49 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:52:49 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:52:49 [Server] [Broadcast]  Sarah received broadcast
+2026/10/19 08:52:49 [Server] [Delivery] delivered to Sarah: from=Server time=27 msg="Participant Sarah joined Chit Chat at logical time 27"
+2026/10/19 08:52:49 [Server] [Delivery] delivered to Dave: from=Server time=27 msg="Participant Sarah joined Chit Chat at logical time 27"
+2026/10/19 08:52:49 [Server] [Delivery] delivered to Evan: from=Server time=27 msg="Participant Sarah joined Chit Chat at logical time 27"
+2026/10/19 08:53:01 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:53:01 [Server] [Broadcast]  Sarah received broadcast
+2026/10/19 08:53:01 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:53:01 [Server] [Publish] Sarah sent message: hey guys!; at logical time 31
+2026/10/19 08:53:01 [Server] [Delivery] delivered to Evan: from=Sarah time=31 msg="hey guys!"
+2026/10/19 08:53:01 [Server] [Delivery] delivered to Sarah: from=Sarah time=31 msg="hey guys!"
+2026/10/19 08:53:01 [Server] [Delivery] delivered to Dave: from=Sarah time=31 msg="hey guys!"
+2026/10/19 08:53:25 [Server] [Broadcast]  Dave received broadcast
+2026/10/19 08:53:25 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:53:25 [Server] [Broadcast]  Sarah received broadcast
+2026/10/19 08:53:25 [Server] [Publish] Dave sent message: Oops, that was too long. Gotta go, see you at 7!; at logical time 35
+2026/10/19 08:53:25 [Server] [Delivery] delivered to Dave: from=Dave time=35 msg="Oops, that was too long. Gotta go, see you at 7!"
+2026/10/19 08:53:25 [Server] [Delivery] delivered to Evan: from=Dave time=35 msg="Oops, that was too long. Gotta go, see you at 7!"
+2026/10/19 08:53:25 [Server] [Delivery] delivered to Sarah: from=Dave time=35 msg="Oops, that was too long. Gotta go, see you at 7!"
+2026/10/19 08:53:37 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:53:37 [Server] [Broadcast]  Sarah received broadcast
+2026/10/19 08:53:37 [Server] [Leave] Dave left Chit Chat at logical time 40
+2026/10/19 08:53:37 [Server] [Delivery] delivered to Evan: from=Server time=40 msg="Participant Dave left Chit Chat at logical time 40"
+2026/10/19 08:53:37 [Server] [Delivery] delivered to Sarah: from=Server time=40 msg="Participant Dave left Chit Chat at logical time 40"
+2026/10/19 08:53:54 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:53:54 [Server] [Broadcast]  Sarah received broadcast
+2026/10/19 08:53:54 [Server] [Publish] Sarah sent message: alright. see you tonight!; at logical time 44
+2026/10/19 08:53:54 [Server] [Delivery] delivered to Evan: from=Sarah time=44 msg="alright. see you tonight!"
+2026/10/19 08:53:54 [Server] [Delivery] delivered to Sarah: from=Sarah time=44 msg="alright. see you tonight!"
+2026/10/19 08:54:02 [Server] [Broadcast]  Evan received broadcast
+2026/10/19 08:54:02 [Server] [Leave] Sarah left Chit Chat at logical time 49
+2026/10/19 08:54:02 [Server] [Delivery] delivered to Evan: from=Server time=49 msg="Participant Sarah left Chit Chat at logical time 49"
+2026/10/19 08:54:11 [Server] [Leave] Evan left Chit Chat at logical time 53
+2026/10/19 08:54:45 [Server] [Shutdown] Server is shutting down
