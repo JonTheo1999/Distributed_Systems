@@ -1,6 +1,6 @@
 # Chit Chat
 
-Mandatory Activity 3 – Distributed Systems, ITU (BSDISYS1KU), group "the GO GO langers".
+Mandatory Activity 3 – Distributed Systems, group "the GO GO langers".
 
 ## Project structure
 
@@ -84,10 +84,3 @@ Only needed after changing `grpc/chitchat.proto`:
 ```
 protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative grpc/chitchat.proto
 ```
-
-## Known limitations
-
-- Usernames must be unique. Two clients with the same name will interfere with each other.
-- If a client crashes or its window is closed without `/leave` or Ctrl+C, the server removes it,
-  but the other participants do not receive a "left" message.
-- If the server stops, connected clients show "Connection lost..." and must be closed with `/leave`.
