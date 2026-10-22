@@ -19,6 +19,8 @@ handin3/
 └── readme.md
 ```
 
+(Excluding log files)
+
 ## Requirements
 
 - Go 1.27 or newer (see `go.mod`)
