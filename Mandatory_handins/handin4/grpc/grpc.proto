@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package dme;
+option go_package = "gm/grpc";
+
+service RicartAgrawala {
+    rpc Request(RequestAccess) returns (RequestConsent);
+}
+
+message RequestAccess {
+    int64 id = 1;
+    int64 timestamp = 2;
+}
+
+message RequestConsent {
+    int64 id = 1;
+    int64 timestamp = 2;
+}
