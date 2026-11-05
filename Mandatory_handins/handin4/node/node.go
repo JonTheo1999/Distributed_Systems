@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"net"
@@ -50,8 +52,16 @@ var addrs = map[int64]string{
 }
 
 func main() {
-	id := flag.Int("id", 0, "id of this node (0, 1, or 2)")
+	id := flag.Int64("id", 0, "id of this node (0, 1, or 2)")
 	flag.Parse()
+
+	logFile, err := os.OpenFile(fmt.Sprintf("node%d.log", *id), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Fatalf("could not open log file: %v", err)
+	}
+	defer logFile.Close()
+	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
 	addr, ok := addrs[*id]
 	if !ok {
@@ -82,6 +92,8 @@ func main() {
 			n.enter()
 			log.Printf("[Node %d] [Critical Section] Entering critical section", n.id)
 			time.Sleep(time.Second) // simulerer at være i critical section i 1 sekund
+			log.Printf("[Node %d] [Critical Section] Doing stuff in critical section", n.id)
+			time.Sleep(time.Second)
 			n.exit()
 		}
 	}()
@@ -90,8 +102,8 @@ func main() {
 	signal.Notify(sigCh, os.Interrupt) // og indsætter det i sigCh kanalen
 	<-sigCh
 
-	log.Printf("[Node %d] [Shutdown] Shutting down node", n.id)
-	gRPCser.stop()
+	log.Printf("[Node %d] [Shutdown] Node is shutting down", n.id)
+	gRPCser.Stop()
 }
 
 func newNode(id int64, port string) *Node {
@@ -141,7 +153,7 @@ func (n *Node) enter() {
 			n.lock.Lock()
 			n.clock = max(n.clock, reply.Timestamp) + 1
 			n.lock.Unlock()
-			log.Printf("[Node %d] [Reply] Received consent from node %d (ts=%d)", n.id, id)
+			log.Printf("[Node %d] [Consent] Received consent from node %d (ts=%d)", n.id, id, reply.Timestamp)
 		}(id, peer)
 	}
 
@@ -157,7 +169,7 @@ func (n *Node) Request(ctx context.Context, req *proto.RequestAccess) (*proto.Re
 	n.lock.Lock()
 	defer n.lock.Unlock()
 
-	n.clock
+	n.clock = max(n.clock, req.Timestamp) + 1
 
 	// Opdaterer clocken baseret på den modtagne timestamp
 	if req.Timestamp > n.clock {
@@ -184,8 +196,10 @@ func (n *Node) hasPriority(req *proto.RequestAccess) bool {
 }
 
 func (n *Node) exit() {
-	n.state = idle                  // ændrer state til idle efter at have forladt critical section
-	for _, peers := range n.peers { // itererer over peers og sender release til hver enkelt
+	n.lock.Lock()
+	n.state = idle // ændrer state til idle efter at have forladt critical section
+	n.lock.Unlock()
 
-	}
+	log.Printf("[Node %d] [Exit] Exiting critical section", n.id)
+	n.cond.Broadcast() // vækker alle ventende goroutines, så de kan tjekke om de kan få adgang til critical section
 }
