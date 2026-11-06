@@ -42,6 +42,18 @@ const (
 	holding              //held
 )
 
+  func (s state) String() string {
+      switch s {
+      case idle:
+          return "idle"
+      case waiting:
+          return "waiting"
+      case holding:
+          return "holding"
+      }
+      return "unknown"
+  }
+
 var nextNodeID int64
 var nextNodeIDMutex sync.Mutex
 
@@ -123,10 +135,10 @@ func (n *Node) connectToPeers(addrs map[int64]string) {
 		}
 		conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			log.Fatalf("[Node] [Error] Failed to connect to peer %s: %v", n.id, id, err)
+			log.Fatalf("[Node %d] [Error] Failed to connect to peer %d: %v", n.id, id, err)
 		}
 		n.peers[id] = proto.NewRicartAgrawalaClient(conn)
-		log.Printf("[Node] [Success] Connected to peer %d at %s", n.id, id, addr)
+		log.Printf("[Node %d] [Success] Connected to peer %d at %s", n.id, id, addr)
 	}
 }
 
@@ -148,7 +160,7 @@ func (n *Node) enter() {
 
 			reply, err := peer.Request(context.Background(), req, grpc.WaitForReady(true))
 			if err != nil {
-				log.Fatalf("[Node %d] [Error] Failed to send request to peer %d: %v", n.id, id)
+				log.Fatalf("[Node %d] [Error] Failed to send request to peer %d: %v", n.id, id, err)
 			}
 			n.lock.Lock()
 			n.clock = max(n.clock, reply.Timestamp) + 1
@@ -158,6 +170,8 @@ func (n *Node) enter() {
 	}
 
 	wg.Wait() // venter på at alle peers har svaret
+
+	log.Printf("[Node %d] [Enter] Received all %d consents (ts=%d)", n.id, len(n.peers), n.requestTS)
 
 	n.lock.Lock()
 	n.state = holding
@@ -179,6 +193,11 @@ func (n *Node) Request(ctx context.Context, req *proto.RequestAccess) (*proto.Re
 
 	log.Printf("[Node %d] [Request] Received request from node %d (ts=%d)", n.id, req.Id, req.Timestamp)
 
+	if n.state == holding || (n.state == waiting && n.hasPriority(req)) {
+    log.Printf("[Node %d] [Defer] Deferring reply to node %d: state=%v, mine=(ts=%d, id=%d), theirs=(ts=%d, id=%d)",
+        n.id, req.Id, n.state, n.requestTS, n.id, req.Timestamp, req.Id)
+	}
+
 	// Hvis noden er i holding state, eller hvis den er i waiting state og har højere prioritet end den anmodende node, skal den vente med at give samtykke
 	for n.state == holding || (n.state == waiting && n.hasPriority(req)) {
 		n.cond.Wait() // venter på at state ændres til idle
@@ -196,10 +215,11 @@ func (n *Node) hasPriority(req *proto.RequestAccess) bool {
 }
 
 func (n *Node) exit() {
+	log.Printf("[Node %d] [Exit] Exiting critical section", n.id)
+
 	n.lock.Lock()
 	n.state = idle // ændrer state til idle efter at have forladt critical section
 	n.lock.Unlock()
-
-	log.Printf("[Node %d] [Exit] Exiting critical section", n.id)
+	
 	n.cond.Broadcast() // vækker alle ventende goroutines, så de kan tjekke om de kan få adgang til critical section
 }
