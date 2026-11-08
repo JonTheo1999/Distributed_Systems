@@ -1,0 +1,150 @@
+2026/11/08 10:36:25.741182 [Node 0] [Success] Connected to peer 1 at localhost:5001
+2026/11/08 10:36:25.760622 [Node 0] [Success] Connected to peer 2 at localhost:5002
+2026/11/08 10:36:27.761470 [Node 0] [Request] Sending request to peers (ts=1)
+2026/11/08 10:36:37.578620 [Node 0] [Consent] Received consent from node 1 (ts=3)
+2026/11/08 10:36:40.215440 [Node 0] [Request] Received request from node 1 (ts=4)
+2026/11/08 10:36:40.215440 [Node 0] [Defer] Deferring reply to node 1: state=waiting, mine=(ts=1, id=0), theirs=(ts=4, id=1)
+2026/11/08 10:36:45.112841 [Node 0] [Request] Received request from node 2 (ts=1)
+2026/11/08 10:36:45.113403 [Node 0] [Defer] Deferring reply to node 2: state=waiting, mine=(ts=1, id=0), theirs=(ts=1, id=2)
+2026/11/08 10:36:52.417277 [Node 0] [Consent] Received consent from node 2 (ts=11)
+2026/11/08 10:36:52.417938 [Node 0] [Enter] Received all 2 consents (ts=1)
+2026/11/08 10:36:52.417938 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:36:53.418836 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:36:54.420019 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:36:54.420019 [Node 0] [Reply] Granting node 1
+2026/11/08 10:36:54.420528 [Node 0] [Reply] Granting node 2
+2026/11/08 10:36:57.420225 [Node 0] [Request] Sending request to peers (ts=13)
+2026/11/08 10:36:57.422040 [Node 0] [Consent] Received consent from node 2 (ts=15)
+2026/11/08 10:36:57.439132 [Node 0] [Request] Received request from node 2 (ts=16)
+2026/11/08 10:36:57.439132 [Node 0] [Defer] Deferring reply to node 2: state=waiting, mine=(ts=13, id=0), theirs=(ts=16, id=2)
+2026/11/08 10:36:58.462680 [Node 0] [Consent] Received consent from node 1 (ts=18)
+2026/11/08 10:36:58.462680 [Node 0] [Enter] Received all 2 consents (ts=13)
+2026/11/08 10:36:58.463249 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:36:59.463545 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:00.464680 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:00.464680 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:01.463454 [Node 0] [Request] Received request from node 1 (ts=19)
+2026/11/08 10:37:01.473413 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:03.465197 [Node 0] [Request] Sending request to peers (ts=22)
+2026/11/08 10:37:03.466309 [Node 0] [Consent] Received consent from node 2 (ts=24)
+2026/11/08 10:37:04.478282 [Node 0] [Consent] Received consent from node 1 (ts=25)
+2026/11/08 10:37:04.478282 [Node 0] [Enter] Received all 2 consents (ts=22)
+2026/11/08 10:37:04.478829 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:05.475248 [Node 0] [Request] Received request from node 2 (ts=25)
+2026/11/08 10:37:05.475248 [Node 0] [Defer] Deferring reply to node 2: state=holding, mine=(ts=22, id=0), theirs=(ts=25, id=2)
+2026/11/08 10:37:05.479373 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:06.479881 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:06.479881 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:07.477940 [Node 0] [Request] Received request from node 1 (ts=28)
+2026/11/08 10:37:07.477940 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:09.480534 [Node 0] [Request] Sending request to peers (ts=31)
+2026/11/08 10:37:09.482026 [Node 0] [Consent] Received consent from node 2 (ts=33)
+2026/11/08 10:37:10.482912 [Node 0] [Request] Received request from node 2 (ts=34)
+2026/11/08 10:37:10.482912 [Node 0] [Defer] Deferring reply to node 2: state=waiting, mine=(ts=31, id=0), theirs=(ts=34, id=2)
+2026/11/08 10:37:10.484075 [Node 0] [Consent] Received consent from node 1 (ts=36)
+2026/11/08 10:37:10.484687 [Node 0] [Enter] Received all 2 consents (ts=31)
+2026/11/08 10:37:10.484687 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:11.485512 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:12.485920 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:12.485920 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:13.484881 [Node 0] [Request] Received request from node 1 (ts=37)
+2026/11/08 10:37:13.484881 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:15.486710 [Node 0] [Request] Sending request to peers (ts=40)
+2026/11/08 10:37:15.487963 [Node 0] [Consent] Received consent from node 2 (ts=42)
+2026/11/08 10:37:15.488723 [Node 0] [Request] Received request from node 2 (ts=43)
+2026/11/08 10:37:15.488723 [Node 0] [Defer] Deferring reply to node 2: state=waiting, mine=(ts=40, id=0), theirs=(ts=43, id=2)
+2026/11/08 10:37:16.491688 [Node 0] [Consent] Received consent from node 1 (ts=45)
+2026/11/08 10:37:16.491688 [Node 0] [Enter] Received all 2 consents (ts=40)
+2026/11/08 10:37:16.491688 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:17.492783 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:18.493063 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:18.493572 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:19.492446 [Node 0] [Request] Received request from node 1 (ts=46)
+2026/11/08 10:37:19.492446 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:21.493875 [Node 0] [Request] Sending request to peers (ts=49)
+2026/11/08 10:37:21.494908 [Node 0] [Consent] Received consent from node 2 (ts=51)
+2026/11/08 10:37:21.496046 [Node 0] [Request] Received request from node 2 (ts=52)
+2026/11/08 10:37:21.496046 [Node 0] [Defer] Deferring reply to node 2: state=waiting, mine=(ts=49, id=0), theirs=(ts=52, id=2)
+2026/11/08 10:37:22.498147 [Node 0] [Consent] Received consent from node 1 (ts=54)
+2026/11/08 10:37:22.499267 [Node 0] [Enter] Received all 2 consents (ts=49)
+2026/11/08 10:37:22.499267 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:23.499901 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:24.500389 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:24.500389 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:25.499550 [Node 0] [Request] Received request from node 1 (ts=55)
+2026/11/08 10:37:25.500120 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:26.500935 [Node 0] [Request] Sending request to peers (ts=58)
+2026/11/08 10:37:26.501977 [Node 0] [Consent] Received consent from node 2 (ts=60)
+2026/11/08 10:37:28.503241 [Node 0] [Consent] Received consent from node 1 (ts=61)
+2026/11/08 10:37:28.503241 [Node 0] [Enter] Received all 2 consents (ts=58)
+2026/11/08 10:37:28.503824 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:29.503835 [Node 0] [Request] Received request from node 2 (ts=61)
+2026/11/08 10:37:29.503835 [Node 0] [Defer] Deferring reply to node 2: state=holding, mine=(ts=58, id=0), theirs=(ts=61, id=2)
+2026/11/08 10:37:29.503835 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:29.504358 [Node 0] [Request] Received request from node 1 (ts=62)
+2026/11/08 10:37:29.504358 [Node 0] [Defer] Deferring reply to node 1: state=holding, mine=(ts=58, id=0), theirs=(ts=62, id=1)
+2026/11/08 10:37:30.505014 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:30.505014 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:30.505014 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:33.505324 [Node 0] [Request] Sending request to peers (ts=67)
+2026/11/08 10:37:33.505899 [Node 0] [Consent] Received consent from node 2 (ts=69)
+2026/11/08 10:37:34.510367 [Node 0] [Consent] Received consent from node 1 (ts=70)
+2026/11/08 10:37:34.510367 [Node 0] [Enter] Received all 2 consents (ts=67)
+2026/11/08 10:37:34.510367 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:35.508606 [Node 0] [Request] Received request from node 2 (ts=70)
+2026/11/08 10:37:35.509187 [Node 0] [Defer] Deferring reply to node 2: state=holding, mine=(ts=67, id=0), theirs=(ts=70, id=2)
+2026/11/08 10:37:35.510338 [Node 0] [Request] Received request from node 1 (ts=73)
+2026/11/08 10:37:35.510338 [Node 0] [Defer] Deferring reply to node 1: state=holding, mine=(ts=67, id=0), theirs=(ts=73, id=1)
+2026/11/08 10:37:35.511447 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:36.511848 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:36.511848 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:36.512529 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:39.512272 [Node 0] [Request] Sending request to peers (ts=76)
+2026/11/08 10:37:39.512777 [Node 0] [Consent] Received consent from node 2 (ts=78)
+2026/11/08 10:37:40.517064 [Node 0] [Consent] Received consent from node 1 (ts=79)
+2026/11/08 10:37:40.517639 [Node 0] [Enter] Received all 2 consents (ts=76)
+2026/11/08 10:37:40.517639 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:41.515582 [Node 0] [Request] Received request from node 2 (ts=79)
+2026/11/08 10:37:41.515582 [Node 0] [Defer] Deferring reply to node 2: state=holding, mine=(ts=76, id=0), theirs=(ts=79, id=2)
+2026/11/08 10:37:41.518134 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:42.518732 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:42.518732 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:43.517826 [Node 0] [Request] Received request from node 1 (ts=82)
+2026/11/08 10:37:43.517826 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:45.519193 [Node 0] [Request] Sending request to peers (ts=85)
+2026/11/08 10:37:45.521121 [Node 0] [Consent] Received consent from node 2 (ts=87)
+2026/11/08 10:37:45.521660 [Node 0] [Request] Received request from node 2 (ts=88)
+2026/11/08 10:37:45.522280 [Node 0] [Defer] Deferring reply to node 2: state=waiting, mine=(ts=85, id=0), theirs=(ts=88, id=2)
+2026/11/08 10:37:46.522745 [Node 0] [Consent] Received consent from node 1 (ts=90)
+2026/11/08 10:37:46.523381 [Node 0] [Enter] Received all 2 consents (ts=85)
+2026/11/08 10:37:46.523381 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:47.522863 [Node 0] [Request] Received request from node 1 (ts=91)
+2026/11/08 10:37:47.523436 [Node 0] [Defer] Deferring reply to node 1: state=holding, mine=(ts=85, id=0), theirs=(ts=91, id=1)
+2026/11/08 10:37:47.524204 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:48.524458 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:48.524458 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:48.524458 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:50.525214 [Node 0] [Request] Sending request to peers (ts=94)
+2026/11/08 10:37:50.527114 [Node 0] [Consent] Received consent from node 2 (ts=96)
+2026/11/08 10:37:52.527509 [Node 0] [Request] Received request from node 2 (ts=97)
+2026/11/08 10:37:52.527509 [Node 0] [Defer] Deferring reply to node 2: state=waiting, mine=(ts=94, id=0), theirs=(ts=97, id=2)
+2026/11/08 10:37:52.529842 [Node 0] [Consent] Received consent from node 1 (ts=99)
+2026/11/08 10:37:52.530367 [Node 0] [Enter] Received all 2 consents (ts=94)
+2026/11/08 10:37:52.530367 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:53.531224 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:37:54.531676 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:37:54.531676 [Node 0] [Reply] Granting node 2
+2026/11/08 10:37:55.530371 [Node 0] [Request] Received request from node 1 (ts=100)
+2026/11/08 10:37:55.530371 [Node 0] [Reply] Granting node 1
+2026/11/08 10:37:56.532512 [Node 0] [Request] Sending request to peers (ts=103)
+2026/11/08 10:37:56.534340 [Node 0] [Consent] Received consent from node 2 (ts=105)
+2026/11/08 10:37:58.536616 [Node 0] [Consent] Received consent from node 1 (ts=106)
+2026/11/08 10:37:58.536616 [Node 0] [Enter] Received all 2 consents (ts=103)
+2026/11/08 10:37:58.536616 [Node 0] [Critical Section] Entering critical section
+2026/11/08 10:37:59.536328 [Node 0] [Request] Received request from node 1 (ts=107)
+2026/11/08 10:37:59.536328 [Node 0] [Defer] Deferring reply to node 1: state=holding, mine=(ts=103, id=0), theirs=(ts=107, id=1)
+2026/11/08 10:37:59.537865 [Node 0] [Critical Section] Doing stuff in critical section
+2026/11/08 10:38:00.538123 [Node 0] [Exit] Exiting critical section
+2026/11/08 10:38:00.538123 [Node 0] [Reply] Granting node 1
+2026/11/08 10:38:01.538586 [Node 0] [Request] Sending request to peers (ts=110)
+2026/11/08 10:38:02.777675 [Node 0] [Shutdown] Node is shutting down
