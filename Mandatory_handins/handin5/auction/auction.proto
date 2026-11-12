@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package auction;
+option go_package = "handin5/auction";
+
+service Auction {
+  rpc Bid (BidRequest) returns (BidReply);
+  rpc Result (ResultRequest) returns (ResultReply);
+}
+
+service Replication {
+  rpc Update (UpdateRequest) returns (UpdateReply); 
+  rpc Alive (AliveRequest) returns (AliveReply);  
+}
+
+message BidRequest {
+    int64 client_id = 1;
+    int64 req_id = 2;
+    int64 amount = 3;
+}
+
+message BidReply {
+    Ack ack = 1;
+}
+
+message ResultRequest {}
+
+message ResultReply {
+    int64 highest_bidder = 1;
+    int64 amount = 2;
+    bool over = 3;
+}
+
+enum Ack { 
+  ACK_UNSPECIFIED = 0;
+  ACK_FAIL = 1;
+  ACK_EXC = 2;
+  ACK_SUCCESS = 3; 
+}
+
+message UpdateRequest {
+    BidRequest req_copy = 1;
+    BidReply bid_copy = 2;
+    ResultReply result_copy = 3;
+    int64 end_time_unix = 4;
+}
+
+message UpdateReply {}
+
+message AliveRequest {}
+
+message AliveReply {}
