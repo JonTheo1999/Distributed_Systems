@@ -34,13 +34,13 @@ type node struct {
 	highestBidder int64 // personen der gav højeste bud. Har sat typen til at være det samme som client.go's id felt
 
 	// Et sluttidspunkt til at afslutte auktionen. 
-	// Jeg har lagt op til at starte timeren når første bid bliver anerkendt. 
-	// Det gør timmeren nem at implementere, men gør at auktionen aldrig stopper, 
+	// Jeg har lagt op til at starte nedtællingen når første bid bliver anerkendt. 
+	// Det gør timeren nem at implementere, men gør at auktionen aldrig stopper, 
 	// hvis ikke der kommer nogle bud. For denne opgave tror jeg det er fint.
 	// hvad tænker I?
 	endAuction time.Time 
 
-	lock sync.Mutex // en lås således at highestBid kun ændres af en goroutine ad gangen
+	lock sync.Mutex // en lås således at fx. highestBid kun ændres af én goroutine ad gangen
 
 	// Hvis en klient sender samme bud flere gange. 
 	// Bruges egentligt kun hvis leader crasher før leader har givet svar. 

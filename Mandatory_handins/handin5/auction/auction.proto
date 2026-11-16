@@ -28,7 +28,7 @@ message ResultRequest {}
 message ResultReply {
     int64 highest_bidder = 1;
     int64 amount = 2;
-    bool over = 3;
+    bool over = 3; // til at fortælle om auktion er slut
 }
 
 enum Ack { 
