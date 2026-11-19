@@ -11,7 +11,7 @@ End time can be set by user, but that is not necessary.
 The default value will take your computers current time and add 30 seconds. 
 You can add your own end time, but make sure that both nodes have exact same time and
 that the time you add is not less than your computers current time.
-```
+
 
 ### 2. Start the leader (terminal 1)
 
