@@ -67,6 +67,7 @@ var addrs = map[int64]string{
 
 func main() {
 	id := flag.Int64("id", 0, "id of this node (0 = leader, 1 = backup)")
+	// end := flag.Int64("end", 0, "end time of the auction as Unix time in seconds")
 	flag.Parse()
 
 	logFile, err := os.OpenFile(fmt.Sprintf("node%d.log", *id), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
@@ -82,6 +83,10 @@ func main() {
 		log.Fatalf("[Node] [Error] Invalid node id: %d", *id)
 	}
 
+	/*if *end <= time.Now().Unix() {
+		log.Fatalf("[Node] [Error] Invalid node end time: %d", *end)
+	}*/
+
 	// forbindelse til den anden node (der er kun to noder, så peer er 1 - id)
 	peerConn, err := grpc.NewClient(addrs[1-*id], grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -96,6 +101,14 @@ func main() {
 		retryBid:   map[int64]latestBid{},
 		endAuction: time.Now().Add(10 * time.Second), // sætter en slutdato for auktionen til 10 sekunder fra nu. Kan ændres.
 	}
+
+	/*n := &node{
+		otherNode:  pb.NewReplicationClient(peerConn),
+		leader:     *id == 0,
+		peerAlive:  true,
+		retryBid:   map[int64]latestBid{},
+		endAuction: time.Unix(*end, 0), 
+	} */
 
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
