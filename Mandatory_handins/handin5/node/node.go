@@ -140,8 +140,8 @@ func main() {
 }
 
 // Backup pinger leader med Alive. Hvis leader ikke svarer inden for tidsgrænsen,
-// er den crashet, og backup bliver leader. Fejl før det første vellykkede ping
-// ignoreres, så backup ikke overtager bare fordi leader ikke er startet endnu.
+// er den crashet, og backup bliver leader. Et ping før leader er startet vil også
+// blive behandlet som et crash. Derfor er det vigtigt at starte leader FØR backup.
 func (n *node) watchLeader(id int64) {
 	//seen := false
 	for {
