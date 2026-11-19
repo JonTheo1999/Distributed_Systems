@@ -130,21 +130,22 @@ func main() {
 // er den crashet, og backup bliver leader. Fejl før det første vellykkede ping
 // ignoreres, så backup ikke overtager bare fordi leader ikke er startet endnu.
 func (n *node) watchLeader(id int64) {
-	seen := false
+	//seen := false
 	for {
-		time.Sleep(1 * time.Second)
+		//time.Sleep(1 * time.Second)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 		_, err := n.otherNode.Alive(ctx, &pb.AliveRequest{})
 		cancel()
 
 		if err == nil {
-			seen = true
+			//seen = true
+			time.Sleep(1 * time.Second)
 			continue
 		}
-		if !seen {
+		/*if !seen {
 			continue
-		}
+		}*/
 
 		n.lock.Lock()
 		n.leader = true
