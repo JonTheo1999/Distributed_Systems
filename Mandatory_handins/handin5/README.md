@@ -16,22 +16,24 @@ that the time you add is not less than your computers current time.
 ### 2. Start the leader (terminal 1)
 
 ```powershell
-go run node/node.go -id 0 # -end <end time> if you want to add your own end time
+go run ./node -id 0 # -end <end time> if you want to add your own end time
 ```
 
 ### 3. Start the backup (terminal 2)
 
 ```powershell
-go run node/node.go -id 1 # -end <end time> if you want to add your own end time
+go run ./node -id 1 # -end <end time> if you want to add your own end time
 ```
 
-Use the **same** end time as for the leader.
+Use the **same** end time as for the leader. The default value of id is 0.
+Meaning you can ignore the id input when starting the leader, but you must add -id 1 
+when starting the backup. Otherwise both nodes will consider themselves the leader.
 
 ### 4. Start the clients (terminal 3 and 4)
 
 ```powershell
-go run client/client.go -id 1
-go run client/client.go -id 2
+go run ./client -id 1
+go run ./client -id 2
 ```
 
 Each client must have a **unique** id, and the id must **not** be 0.
